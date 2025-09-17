@@ -1,11 +1,16 @@
 import express, { json, static as static_ } from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import path from 'path';
 import 'dotenv/config';
 
 // routes
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+
+// config
+import connectDB from './lib/db.js';
+import { ENV } from './lib/env.js';
 
 const app = express();
 
@@ -14,14 +19,15 @@ const __dirname = path.resolve();
 // middlewares
 app.use(json());
 app.use(cookieParser());
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 
 // endpoints
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
-const PORT = process.env.PORT;
+const PORT = ENV.PORT;
 
-if (process.env.NODE_ENV === 'production') {
+if (ENV.NODE_ENV === 'production') {
   app.use(static_(path.join(__dirname, '../client/dist')));
 
   app.get('*', (_, res) => {
@@ -29,4 +35,6 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => console.log(`\nSERVER on http://localhost:${PORT}\n`));
+connectDB().then(() => {
+  app.listen(PORT, () => console.log(`\nSERVER on http://localhost:${PORT}\n`));
+});
