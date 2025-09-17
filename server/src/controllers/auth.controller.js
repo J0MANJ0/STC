@@ -1,16 +1,111 @@
+import bcrypt from 'bcryptjs';
+import USER from '../models/user.model.js';
+import { generateToken } from '../lib/utils.js';
+
 export const signup = async (req, res) => {
   try {
-    res.json('signup');
+    const {
+      body: { fullName, password, email },
+    } = req;
+
+    if (!fullName || !email || !password)
+      return res.status(400).json({
+        success: false,
+        message: 'Missing field(s)',
+      });
+
+    if (password.length < 6)
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be least 6 characters',
+      });
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email))
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email format',
+      });
+
+    const existingUser = await USER.findOne({ email });
+
+    if (existingUser)
+      return res.status(400).json({
+        success: false,
+        message: 'Account already exists',
+      });
+
+    const salt = await bcrypt.genSalt(10);
+
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await USER.create({
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+
+    if (user) {
+      generateToken(user._id, res);
+
+      return res.status(201).json({
+        success: true,
+        user,
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user data',
+      });
+    }
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ message: error });
   }
 };
 
 export const login = async (req, res) => {
   try {
-    res.json('login');
+    const {
+      body: { password, email },
+    } = req;
+
+    if (!email || !password)
+      return res.status(400).json({
+        success: false,
+        message: 'Missing field(s)',
+      });
+
+    if (password.length < 6)
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be least 6 characters',
+      });
+
+    const user = await USER.findOne({ email });
+
+    if (!user)
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+
+    const userPassword = await bcrypt.compare(password, user.password);
+
+    if (!userPassword)
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid credentials',
+      });
+
+    generateToken(user._id, res);
+
+    return res.status(201).json({
+      success: true,
+      user,
+    });
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ message: error });
   }
 };
 
