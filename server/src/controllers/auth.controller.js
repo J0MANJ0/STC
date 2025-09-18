@@ -3,6 +3,7 @@ import USER from '../models/user.model.js';
 import { generateToken } from '../lib/utils.js';
 import { sendWelcome } from '../emails/email.handler.js';
 import { ENV } from '../lib/env.js';
+import cloudinary from '../lib/cloudinary.js';
 
 export const signup = async (req, res) => {
   try {
@@ -122,5 +123,29 @@ export const logout = (_, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const {
+      body: { profilePic },
+      user: { _id: userId },
+    } = req;
+
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+    const user = await USER.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { new: true }
+    );
+
+    return res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
