@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import USER from '../models/user.model.js';
 import { generateToken } from '../lib/utils.js';
+import { sendWelcome } from '../emails/email.handler.js';
+import { ENV } from '../lib/env.js';
 
 export const signup = async (req, res) => {
   try {
@@ -48,6 +50,8 @@ export const signup = async (req, res) => {
 
     if (user) {
       generateToken(user._id, res);
+
+      await sendWelcome(user.email, user.fullName, ENV.CLIENT_URL);
 
       return res.status(201).json({
         success: true,
