@@ -57,6 +57,7 @@ export const signup = async (req, res) => {
       return res.status(201).json({
         success: true,
         user,
+        message: 'Account created successfully',
       });
     } else {
       return res.status(400).json({
@@ -108,6 +109,7 @@ export const login = async (req, res) => {
     return res.json({
       success: true,
       user,
+      message: 'Login successful',
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -141,7 +143,11 @@ export const updateProfile = async (req, res) => {
       { new: true }
     );
 
-    return res.json({ success: true, user });
+    return res.json({
+      success: true,
+      user,
+      message: 'Profile updated successfully',
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
