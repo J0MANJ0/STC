@@ -29,7 +29,7 @@ const useAuth = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const {
-        data: { success, user },
+        data: { success, user, message },
       } = await api.post('/auth/signup', data);
 
       if (success) {
@@ -50,8 +50,8 @@ const useAuth = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const {
-        data: { success, user },
-      } = await api.post('/auth/signup', data);
+        data: { success, user, message },
+      } = await api.post('/auth/login', data);
 
       if (success) {
         set({ user });
