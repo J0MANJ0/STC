@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 import Chat from './pages/chat'
 import SignIn from './pages/sign-in'
 import SignUp from './pages/sign-up'
@@ -13,7 +13,7 @@ const App = () => {
 
   useEffect(() => {
     checkAuth()
-  }, [checkAuth, user])
+  }, [checkAuth])
 
   if (isCheckingAuth) return <PageLoader />
   return (
@@ -25,9 +25,9 @@ const App = () => {
 
 
       <Routes>
-        <Route path='/' element={<Chat />} />
-        <Route path='/sign-in' element={<SignIn />} />
-        <Route path='/sign-up' element={<SignUp />} />
+        <Route path='/' element={user ? <Chat /> : <Navigate to={'/sign-in'} />} />
+        <Route path='/sign-in' element={!user ? <SignIn /> : <Navigate to={'/'} />} />
+        <Route path='/sign-up' element={!user ? <SignUp /> : <Navigate to={'/'} />} />
       </Routes>
     </div>
   )

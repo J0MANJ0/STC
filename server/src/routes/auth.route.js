@@ -10,7 +10,7 @@ import { arcjetProtection } from '../middlewares/arcjet.middleware.js';
 
 const authRouter = Router();
 
-// authRouter.use(arcjetProtection);
+authRouter.use(arcjetProtection);
 
 authRouter.post('/signup', signup);
 authRouter.post('/login', login);
