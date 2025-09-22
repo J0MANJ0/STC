@@ -8,13 +8,13 @@ export const getContacts = async (req, res) => {
       user: { _id: authUser },
     } = req;
 
-    const users = await USER.find({ _id: { $ne: authUser } }).select(
+    const contacts = await USER.find({ _id: { $ne: authUser } }).select(
       '-password'
     );
 
     return res.json({
       success: true,
-      users,
+      contacts,
     });
   } catch (error) {
     res.status(500).json({

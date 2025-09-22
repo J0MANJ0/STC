@@ -10,7 +10,7 @@ import { arcjetProtection } from '../middlewares/arcjet.middleware.js';
 
 const messageRouter = Router();
 
-messageRouter.use(arcjetProtection, protect);
+messageRouter.use(protect);
 
 messageRouter.get('/contacts', getContacts);
 messageRouter.get('/chats', getChats);
