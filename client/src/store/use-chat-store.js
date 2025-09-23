@@ -92,6 +92,38 @@ const useChat = create((set, get) => ({
       set({ messages });
     }
   },
+
+  subscribeMessages: async () => {
+    const { selectedUser, soundEnabled } = get();
+
+    if (!selectedUser) return;
+
+    const socket = useAuth.getState().socket;
+
+    socket.on('newMessage', (newMessage) => {
+      const isMessageFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
+
+      if (!isMessageFromSelectedUser) return;
+
+      const currentMessages = get().messages;
+
+      set({ messages: [...currentMessages, newMessage] });
+
+      if (soundEnabled) {
+        const notificationSound = new Audio('/sounds/notification.mp3');
+
+        notificationSound.currentTime = 0;
+        notificationSound
+          .play()
+          .catch((e) => console.log('Audio play failed', e));
+      }
+    });
+  },
+  unsubscribeMessages: () => {
+    const socket = useAuth.getState().socket;
+    socket.off('newMessage');
+  },
 }));
 
 export default useChat;

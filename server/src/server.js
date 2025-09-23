@@ -1,4 +1,4 @@
-import express, { json, static as static_ } from 'express';
+import { json, static as static_ } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
@@ -11,8 +11,7 @@ import messageRoutes from './routes/message.route.js';
 // config
 import connectDB from './lib/db.js';
 import { ENV } from './lib/env.js';
-
-const app = express();
+import { app, server } from './lib/socket.js';
 
 const __dirname = path.resolve();
 
@@ -36,5 +35,7 @@ if (ENV.NODE_ENV === 'production') {
 }
 
 connectDB().then(() => {
-  app.listen(PORT, () => console.log(`\nSERVER on http://localhost:${PORT}\n`));
+  server.listen(PORT, () =>
+    console.log(`\nSERVER on http://localhost:${PORT}\n`)
+  );
 });
