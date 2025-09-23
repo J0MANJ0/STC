@@ -18,6 +18,7 @@ const useAuth = create((set, get) => ({
       } = await api.get('/auth/check');
 
       success ? set({ user }) : set({ user: null });
+      get().connectSocket();
     } catch (error) {
       console.log({ message: error.message });
     } finally {
@@ -76,6 +77,7 @@ const useAuth = create((set, get) => ({
       if (success) {
         set({ user: null });
         toast.success(message);
+        get().disconnectSocket();
       }
     } catch (error) {
       console.log({ message: error.message });
@@ -116,7 +118,7 @@ const useAuth = create((set, get) => ({
       set({ onlineUsers: userIds });
     });
   },
-  disconnect: () => {
+  disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
   },
 }));
